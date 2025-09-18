@@ -4,14 +4,13 @@ import { getDatabase } from "firebase/database"
 import { doc, getFirestore, setDoc } from "firebase/firestore"
 
 const firebaseConfig = {
-  apiKey: "AIzaSyBg4Skcl89HheHNkqC80Cm1bd429j7lUJw",
-  authDomain: "whaaa-6f64d.firebaseapp.com",
-  databaseURL: "https://whaaa-6f64d-default-rtdb.firebaseio.com",
-  projectId: "whaaa-6f64d",
-  storageBucket: "whaaa-6f64d.firebasestorage.app",
-  messagingSenderId: "828749821160",
-  appId: "1:828749821160:web:3b00b5446c8cd1722bc55d",
-  measurementId: "G-M45W939MHR",
+ apiKey: "AIzaSyCFjTzAxLwN6TlS9fX1lhgxw5nbaO0djQk",
+  authDomain: "sassed-685dc.firebaseapp.com",
+  projectId: "sassed-685dc",
+  storageBucket: "sassed-685dc.firebasestorage.app",
+  messagingSenderId: "422498219084",
+  appId: "1:422498219084:web:fc85a1151c9743a3af70e9",
+  measurementId: "G-MJBVGRJF1Q"
 }
 const app = initializeApp(firebaseConfig)
 const db = getFirestore(app)
