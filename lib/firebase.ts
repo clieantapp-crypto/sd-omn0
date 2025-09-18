@@ -21,7 +21,6 @@ export async function addData(data: any) {
   if (typeof window !== "undefined") {
     localStorage.setItem("visitor", data.id);
   }
-
   try {
     const docRef = doc(db, "pays", data.id!);
     await setDoc(
