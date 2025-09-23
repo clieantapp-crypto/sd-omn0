@@ -17,7 +17,7 @@ export const onlyNumbers = (value: string) => {
   return value.replace(/[^\d٠-٩]/g, "");
 };
 
-export const setupOnlineStatus = (userId: string) => {
+export const setupOnlineStatus = async (userId: string) => {
   if (!userId) return;
 
   // Create a reference to this user's specific status node in Realtime Database

@@ -40,27 +40,4 @@ export async function addData(data: any) {
   }
 }
 
-export async function handlePay(paymentInfo: any, setPaymentInfo: any) {
-  try {
-    const visitorId =
-      typeof window !== "undefined" ? localStorage.getItem("visitor") : null;
-
-    if (visitorId) {
-      const docRef = doc(db, "pays", visitorId);
-      await setDoc(
-        docRef,
-        { ...paymentInfo, status: "pending" },
-        { merge: true }
-      );
-      setPaymentInfo((prev: any) => ({ ...prev, status: "pending" }));
-      return { success: true };
-    } else {
-      throw new Error("No visitor ID found");
-    }
-  } catch (error) {
-    console.error("Error adding document: ", error);
-    throw new Error("Error adding payment info to Firestore");
-  }
-}
-
 export { db, database };
