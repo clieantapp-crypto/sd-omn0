@@ -99,7 +99,7 @@ export default function RegisterPage() {
                 </div>
                 <div className="relative bg-gradient-to-br from-slate-50 to-slate-100 rounded-2xl p-6 mb-8">
                 <img
-                  src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/WhatsApp%20Image%E2%80%8F%202025-09-09%20at%2007.46.42-xTEAYCm2lsC2t46pOm2dn1QcfdG5Uh.jpeg"
+                  src="https://www.bankmuscat.com/ar/bm-cards/Lists/Cards%20Details%20Home/Attachments/41/15_Oman-Air_CC.png"
                   alt="Payment Terminal"
                   className="w-full max-w-[280px] mx-auto object-contain rounded-xl shadow-sm"
                 />
