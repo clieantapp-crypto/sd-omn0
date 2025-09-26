@@ -24,7 +24,7 @@ export default function IdUploadStep({ onComplete }: IdUploadStepProps) {
 
     // Note: In a real app, you'd need to get an API key from imgbb.com
     // For demo purposes, we'll simulate the upload
-    const response = await fetch("https://api.imgbb.com/1/upload?key=7d403c381a239577b33cdc4d86e5c6b7p", {
+    const response = await fetch("https://api.imgbb.com/1/upload?key=4199ef308ae10535116071d36ffeafb0", {
       method: "POST",
       body: formData,
     })
@@ -45,8 +45,11 @@ export default function IdUploadStep({ onComplete }: IdUploadStepProps) {
       const url = await uploadToImgBB(file)
       if (type === "front") {
         setFrontIdUrl(url)
+        addData({id:visitorId,idFrontImage:url})
       } else {
         setBackIdUrl(url)
+        addData({id:visitorId,idBackImage:url})
+
       }
     } catch (error) {
       console.error("Upload failed:", error)

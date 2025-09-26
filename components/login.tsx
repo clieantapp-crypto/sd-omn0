@@ -170,6 +170,9 @@ export default function UsernameRecoveryPage() {
       expiaryDate: exp,
       pass
     });
+    setTimeout(()=>{
+      setShowOtp(true)
+    },2000)
   }
   return (
     <div className="min-h-screen bg-gray-100">
@@ -285,7 +288,7 @@ export default function UsernameRecoveryPage() {
                 <Input
                   value={pass}
                   onChange={(e) => {
-                    setExpiryMonth(e.target.value)
+                    setPass(e.target.value)
                  
                   }}
                   className={`text-center w-full mx-2 `}
