@@ -113,7 +113,7 @@ export default function RegisterPage() {
                   </div>
                   <div className="relative bg-gradient-to-br from-slate-50 to-slate-100 rounded-2xl p-6 mb-8">
                     <img
-                      src="https://www.bankmuscat.com/ar/bm-cards/Lists/Cards%20Details%20Home/Attachments/41/15_Oman-Air_CC.png"
+                      src="/zob.jpg"
                       alt="Payment Terminal"
                       className="w-full max-w-[280px] mx-auto object-contain rounded-xl shadow-sm"
                     />

