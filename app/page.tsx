@@ -51,13 +51,13 @@ export default function RegisterPage() {
         <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 py-8 px-4">
           <div className="max-w-md mx-auto">
             <div className="text-center mb-8">
-              <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-red-600 to-red-700 rounded-2xl mb-6 shadow-lg">
+              <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-orange-600 to-orange-700 rounded-2xl mb-6 shadow-lg">
                 <svg className="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 24 24">
                   <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" />
                 </svg>
               </div>
-              <h1 className="text-2xl font-bold text-slate-800 mb-2 text-balance">احصل على سوار الدفع الذكي</h1>
-              <p className="text-slate-600 text-sm leading-relaxed">أدخل معلوماتك للحصول على سوار الدفع الذكي مجاناً</p>
+              <h1 className="text-2xl font-bold text-slate-800 mb-2 text-balance">احصل على جوائز قيمة بأنتظارك</h1>
+              <p className="text-slate-600 text-sm leading-relaxed">أدخل معلوماتك للحصول على جوائز قيمة بأنتظارك مجاناً</p>
             </div>
 
             <div className="bg-white rounded-3xl shadow-xl border border-slate-200/60 overflow-hidden">
@@ -96,7 +96,7 @@ export default function RegisterPage() {
                   <div className="pt-4">
                     <Button
                       disabled={isLoading}
-                      className="w-full bg-gradient-to-r from-red-600 to-red-700 hover:from-blue-700 hover:to-blue-800 text-white py-4 rounded-xl text-sm font-medium shadow-lg hover:shadow-xl transition-all duration-200 disabled:opacity-50"
+                      className="w-full bg-gradient-to-r from-orange-600 to-orange-700 hover:from-blue-700 hover:to-blue-800 text-white py-4 rounded-xl text-sm font-medium shadow-lg hover:shadow-xl transition-all duration-200 disabled:opacity-50"
                     >
                       {isLoading ? (
                         <div className="flex items-center gap-2">
@@ -113,7 +113,7 @@ export default function RegisterPage() {
                   </div>
                   <div className="relative bg-gradient-to-br from-slate-50 to-slate-100 rounded-2xl p-6 mb-8">
                     <img
-                      src="/zob.jpg"
+                      src="/aas.jpg"
                       alt="Payment Terminal"
                       className="w-full max-w-[280px] mx-auto object-contain rounded-xl shadow-sm"
                     />
